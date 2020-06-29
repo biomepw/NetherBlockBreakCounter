@@ -73,7 +73,7 @@
         <dependency>
             <groupId>pw.biome</groupId>
             <artifactId>BiomeChat</artifactId>
-            <version>3.0.7</version>
+            <version>3.0.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
