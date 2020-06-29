@@ -19,9 +19,3 @@ jobs:
           java-version: 1.8
       - name: Build with Maven
         run: mvn clean package
-      - run: rm -rf target/original*
-      - run: mkdir staging && cp target/*.jar staging
-      - uses: actions/upload-artifact@v1
-        with:
-          name: NetherBlockBreakCounter
-          path: staging
