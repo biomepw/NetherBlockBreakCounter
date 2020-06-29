@@ -71,8 +71,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>pro.husk</groupId>
-            <artifactId>ichat</artifactId>
+            <groupId>pw.biome</groupId>
+            <artifactId>BiomeChat</artifactId>
             <version>3.0.7</version>
             <scope>provided</scope>
         </dependency>
