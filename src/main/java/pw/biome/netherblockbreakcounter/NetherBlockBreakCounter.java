@@ -10,31 +10,37 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import pro.husk.ichat.iChat;
-import pro.husk.ichat.obj.PlayerCache;
+import pw.biome.biomechat.BiomeChat;
+import pw.biome.biomechat.obj.PlayerCache;
+import pw.biome.biomechat.obj.ScoreboardHook;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class NetherBlockBreakCounter extends JavaPlugin implements Listener {
+public final class NetherBlockBreakCounter extends JavaPlugin implements Listener, ScoreboardHook {
 
     private final ConcurrentHashMap<UUID, Integer> scores = new ConcurrentHashMap<>();
+
+    private int scoreboardTaskId;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
-        iChat.getPlugin().stopScoreboardTask();
+        BiomeChat biomeChat = BiomeChat.getPlugin();
+        biomeChat.registerHook(this);
+        biomeChat.stopScoreboardTask();
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, this::saveToFileTask, 600, 600);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, this::updateScoreboards, 10, 10);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, this::restartScoreboardTask, 10, 10);
     }
 
     @Override
     public void onDisable() {
         saveToFileTask();
+        getServer().getScheduler().cancelTasks(this);
     }
 
     @EventHandler
@@ -63,8 +69,9 @@ public final class NetherBlockBreakCounter extends JavaPlugin implements Listene
         }));
     }
 
-    public void updateScoreboards() {
-        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+    @Override
+    public void restartScoreboardTask() {
+        scoreboardTaskId = Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             ImmutableList<Player> playerList = ImmutableList.copyOf(getServer().getOnlinePlayers());
             for (Player player : playerList) {
                 PlayerCache playerCache = PlayerCache.getFromUUID(player.getUniqueId());
@@ -76,7 +83,7 @@ public final class NetherBlockBreakCounter extends JavaPlugin implements Listene
                 player.setPlayerListHeader(ChatColor.BLUE + "Biome");
                 player.setPlayerListName(playerCache.getRank().getPrefix() + player.getDisplayName() + ChatColor.GOLD + " | " + score);
             }
-        });
+        }).getTaskId();
     }
 
     private void checkOrLoadUserStats(UUID uuid) {
@@ -85,5 +92,13 @@ public final class NetherBlockBreakCounter extends JavaPlugin implements Listene
                 scores.put(uuid, getConfig().getInt(uuid.toString()));
             }
         });
+    }
+
+    @Override
+    public void stopScoreboardTask() {
+        if (scoreboardTaskId != 0) {
+            getServer().getScheduler().cancelTask(scoreboardTaskId);
+            scoreboardTaskId = 0;
+        }
     }
 }

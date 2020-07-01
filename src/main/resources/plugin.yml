@@ -2,4 +2,4 @@ name: NetherBlockBreakCounter
 version: ${project.version}
 main: pw.biome.netherblockbreakcounter.NetherBlockBreakCounter
 api-version: 1.15
-depend: [iChat]
+depend: [BiomeChat]
