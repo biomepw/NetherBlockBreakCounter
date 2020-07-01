@@ -58,8 +58,8 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <id>husk</id>
+            <url>https://maven.husk.pro/repository/maven-public/</url>
         </repository>
     </repositories>
 
