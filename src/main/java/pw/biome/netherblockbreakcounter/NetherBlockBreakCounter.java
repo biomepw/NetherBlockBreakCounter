@@ -3,6 +3,7 @@ package pw.biome.netherblockbreakcounter;
 import com.google.common.collect.ImmutableList;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,11 +53,16 @@ public final class NetherBlockBreakCounter extends JavaPlugin implements Listene
     public void blockBreak(BlockBreakEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         Block block = event.getBlock();
+        Location blockLocation = block.getLocation();
 
         getServer().getScheduler().runTaskAsynchronously(this, () -> {
-            if (block.getLocation().getWorld().getName().equalsIgnoreCase("world_nether")) {
-                int currentScore = scores.get(uuid);
-                scores.put(uuid, currentScore + 1);
+            if (blockLocation.getWorld().getName().equalsIgnoreCase("world_nether")) {
+                Location spawn = new Location(blockLocation.getWorld(), 0, 65, 0);
+                double distance = blockLocation.distance(spawn);
+                if (distance < 500) {
+                    int currentScore = scores.get(uuid);
+                    scores.put(uuid, currentScore + 1);
+                }
             }
         });
     }
